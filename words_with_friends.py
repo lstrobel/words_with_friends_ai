@@ -62,7 +62,7 @@ class Board():
             print(' ')  # To change lines
         print('+' + '---+' * len(self.tiles[0]))
 
-    def play_word(self, word, rack: Counter, location: (int, int), direction):
+    def play_word(self, word, rack: Counter, location: (int, int), direction, debug=False):
         """Plays a word in the direction given. Will see if you can play that word.
             If the word can be played, it plays it and returns the score of that word.
             If it cannot be played, raises a BadPlayError"""
@@ -86,15 +86,16 @@ class Board():
         score, played_letters = self._get_score(direction, word, rack, [], location, 0, 1, [])
 
         # Mark multipliers as used and place tiles
-        rack.subtract(played_letters)
-        if direction == 'down':
-            for row in range(location[0], location[0] + len(word)):
-                self.tiles[row][location[1]] = word[row - location[0]]
-                self.expended_modifiers[row][location[1]] = True
-        elif direction == 'right':
-            for col in range(location[1], location[1] + len(word)):
-                self.tiles[location[0]][col] = word[col - location[1]]
-                self.expended_modifiers[location[0]][col] = True
+        if not debug:
+            rack.subtract(played_letters)
+            if direction == 'down':
+                for row in range(location[0], location[0] + len(word)):
+                    self.tiles[row][location[1]] = word[row - location[0]]
+                    self.expended_modifiers[row][location[1]] = True
+            elif direction == 'right':
+                for col in range(location[1], location[1] + len(word)):
+                    self.tiles[location[0]][col] = word[col - location[1]]
+                    self.expended_modifiers[location[0]][col] = True
 
         return score
 
@@ -118,13 +119,20 @@ class Board():
             return self._calculate_score(bonus, multiplier, other_scores, this_score), played_letters
         this_letter = word[0]
         if self.tiles[location[0]][location[1]] is None:  # The tile needs to be placed from the rack
-            if this_letter not in rack.elements():
-                rack.update(played_letters)  # Add back the played letters before bailing
-                raise BadPlayError("Needed letter not in rack")
-
             # Play the tile
-            rack[this_letter] -= 1
-            played_letters.append(this_letter)
+            if this_letter not in rack.elements():
+                if '?' not in rack.elements():
+                    rack.update(played_letters)  # Add back the played letters before bailing
+                    raise BadPlayError("Needed letter not in rack")
+                else:
+                    rack['?'] -= 1
+                    played_letters.append('?')
+                    using_wildcard = True
+            else:
+                rack[this_letter] -= 1
+                played_letters.append(this_letter)
+                using_wildcard = False
+
             self.tiles[location[0]][location[1]] = this_letter
 
             # Validate the play's cross words
@@ -150,6 +158,8 @@ class Board():
 
             # Update score
             letter_score = self.letter_values[this_letter]
+            if using_wildcard:
+                letter_score = self.letter_values['?']
             if self._get_mod_info(location) is not None:
                 mod_type, mod_val = self._get_mod_info(location)
                 if mod_type == "word":

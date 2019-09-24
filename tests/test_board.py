@@ -130,6 +130,43 @@ def test_basic_first_play_right(board):
     assert board.tiles == new_tiles
 
 
+def test_wildcard_usage_1(board):
+    assert board.play_word("CAT", Counter("C?TS"), (7, 7), "right") == 5
+    new_tiles = [[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, "C", "A", "T", None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
+    assert board.tiles == new_tiles
+    assert board.play_word("ADD", Counter("??"), (7, 8), "down") == 36
+    new_tiles = [[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, "C", "A", "T", None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, "D", None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, "D", None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+                 [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
+    assert board.tiles == new_tiles
+
+
 def test_game_1(board):
     assert board.play_word("CAT", Counter("CATS"), (7, 7), "right") == 6
     new_tiles = [[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
@@ -308,6 +345,10 @@ def test_using_letters_in_rack(board):
     c = Counter("FE")
     board.play_word("FET", c, (9, 5), "right")
     assert c + Counter() == Counter()
+
+    c = Counter("BA??X")
+    board.play_word("BACCATED", c, (4, 7), "down")
+    assert c + Counter() == Counter("X")
 
 
 def test_location_out_of_bounds(board):
