@@ -296,6 +296,20 @@ def test_not_using_letters_in_rack(board):
     assert c == Counter("HLLO")
 
 
+def test_using_letters_in_rack(board):
+    c = Counter("CATS")
+    board.play_word("CAT", c, (7, 7), "down")
+    assert c + Counter() == Counter("S")
+
+    c = Counter("ALESS")
+    board.play_word("ALES", c, (10, 5), "right")
+    assert c + Counter() == Counter("S")
+
+    c = Counter("FE")
+    board.play_word("FET", c, (9, 5), "right")
+    assert c + Counter() == Counter()
+
+
 def test_location_out_of_bounds(board):
     with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (-1, 1), "down")

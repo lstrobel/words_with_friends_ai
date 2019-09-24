@@ -113,7 +113,7 @@ class Board():
         if len(word) == 0:  # We've gotten to the end of this word
             bonus = 0
             rack.update(played_letters)
-            if set(rack.elements()) == set(played_letters):  # Bonus points for using the whole rack
+            if rack - Counter(played_letters) == Counter():  # Bonus points for using the whole rack
                 bonus += 35
             return self._calculate_score(bonus, multiplier, other_scores, this_score), played_letters
         this_letter = word[0]
