@@ -202,7 +202,7 @@ def test_game_2(board):
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]]
     assert board.tiles == new_tiles
-    assert board.play_word("BACCATED", Counter("BACDX"), (4,7), "down") == 36
+    assert board.play_word("BACCATED", Counter("BACDX"), (4, 7), "down") == 36
     new_tiles = [[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
@@ -222,7 +222,7 @@ def test_game_2(board):
     with pytest.raises(BadPlayError, match="Secondary word not in dict"):
         board.play_word("FATS", Counter("FETAS"), (9, 5), "right")
     assert board.tiles == new_tiles
-    assert board.play_word("FET", Counter("FE"), (9,5), "right") == 65
+    assert board.play_word("FET", Counter("FE"), (9, 5), "right") == 65
     new_tiles = [[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
                  [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
@@ -287,7 +287,7 @@ def test_board_unchanged_after_bad_play_right(board):
     assert board.tiles == new_tiles
 
 
-def test_using_letters_in_rack(board):
+def test_not_using_letters_in_rack(board):
     with pytest.raises(BadPlayError, match="Needed letter not in rack"):
         board.play_word("HELLO", Counter(""), (7, 7), "down")
     c = Counter("HLLO")
@@ -299,10 +299,15 @@ def test_using_letters_in_rack(board):
 def test_location_out_of_bounds(board):
     with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (-1, 1), "down")
+    with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (-1, 0), "right")
+    with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (7, -1), "down")
+    with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (7, -1), "right")
+    with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (board_size, 0), "down")
+    with pytest.raises(BadPlayError, match="Location out of bounds"):
         board.play_word("CAT", Counter("CATS"), (0, board_size), "right")
 
 
@@ -310,6 +315,7 @@ def test_invalid_location_based_on_tiles(board):
     board.play_word("hello", Counter("HELLOX"), (7, 7), "down")
     with pytest.raises(BadPlayError, match="Location given cannot be the start of the word"):
         board.play_word("HELLOS", Counter("HELLOS"), (8, 7), "down")
+    with pytest.raises(BadPlayError, match="Location given cannot be the start of the word"):
         board.play_word("HELLOS", Counter("HELLOS"), (11, 7), "down")
     board.play_word("HELLOS", Counter("HELLOS"), (7, 7), "down")
     board.play_word("OPEN", Counter("OPEN"), (11, 7), "right")
@@ -320,6 +326,14 @@ def test_invalid_location_based_on_tiles(board):
 def test_word_not_in_dict(board):
     with pytest.raises(BadPlayError, match="Passed word not in dictionary"):
         board.play_word("ALKJSHDLIJGASLJDBLAKJSHD", Counter("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), (7, 7), "down")
+    with pytest.raises(BadPlayError, match="Passed word not in dictionary"):
         board.play_word("2", Counter("2"), (7, 7), "down")
+    with pytest.raises(BadPlayError, match="Passed word not in dictionary"):
         board.play_word("3RD", Counter("3RD"), (7, 7), "down")
+    with pytest.raises(BadPlayError, match="Passed word not in dictionary"):
         board.play_word("?ELLO", Counter("HELLO?"), (7, 7), "down")
+
+
+def test_bad_direction(board):
+    with pytest.raises(BadPlayError, match="Bad direction"):
+        board.play_word("HELLO", Counter("HELLO"), (7, 7), "dwon")
