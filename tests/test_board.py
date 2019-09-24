@@ -2,7 +2,7 @@ from collections import Counter
 
 import pytest
 
-from words_with_friends import BadPlayError, Board, board_size
+from words_with_friends import BadPlayError, Board, board_size, create_empty_2d_board
 
 
 @pytest.fixture
@@ -322,6 +322,28 @@ def test_board_unchanged_after_bad_play_right(board):
     with pytest.raises(BadPlayError, match="Secondary word not in dict"):
         board.play_word("SELL", Counter("SELLX"), (10, 5), "right")
     assert board.tiles == new_tiles
+
+
+def test_debug_mode(board):
+    c = Counter("CATS")
+    board.play_word("CAT", c, (7, 7), "down", debug=True)
+    assert board.tiles == create_empty_2d_board(board_size, None)
+    assert c + Counter() == Counter("CATS")
+
+    c = Counter("ALESS")
+    board.play_word("ALES", c, (7, 7), "right", debug=True)
+    assert board.tiles == create_empty_2d_board(board_size, None)
+    assert c == Counter("ALESS")
+
+    c = Counter("FET")
+    board.play_word("FET", c, (7, 7), "right", debug=True)
+    assert board.tiles == create_empty_2d_board(board_size, None)
+    assert c == Counter("FET")
+
+    c = Counter("BA??????X")
+    board.play_word("BACCATED", c, (7, 7), "down", debug=True)
+    assert board.tiles == create_empty_2d_board(board_size, None)
+    assert c == Counter("BA??????X")
 
 
 def test_not_using_letters_in_rack(board):
