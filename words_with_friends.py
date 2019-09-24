@@ -99,6 +99,7 @@ class Board():
 
         return score
 
+    # TODO: Consider a faster approach that involves https://www.cs.cmu.edu/afs/cs/academic/class/15451-s06/www/lectures/scrabble.pdf
     def _get_score(self, direction, word, rack, played_letters, location, this_score, multiplier, other_scores):
         """
         :param direction: The direction of the play
